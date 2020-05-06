@@ -18,6 +18,7 @@ import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
 import getValidationErrors from '../../utills/getValidationErrors';
+import api from '../../services/api';
 
 interface SingUpFormData {
   name: string;
@@ -32,7 +33,7 @@ const SigUp: React.FC = () => {
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
-  const handleSingUp = useCallback(async (data: SingUpFormData) => {
+  const handleSingnUp = useCallback(async (data: SingUpFormData) => {
     try {
       formRef.current?.setErrors({});
       const schema = Yup.object().shape({
@@ -47,8 +48,14 @@ const SigUp: React.FC = () => {
         abortEarly: false,
       });
 
-      // await api.post("/users", data);
-      // history.push("/");
+      await api.post('/users', data);
+
+      Alert.alert(
+        'Cadastro realizado com sucesso!',
+        'Você ja pode fazer login na aplicação.',
+      );
+
+      navitation.goBack();
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
@@ -80,7 +87,7 @@ const SigUp: React.FC = () => {
               <Title>Crie sua conta</Title>
             </View>
 
-            <Form ref={formRef} onSubmit={handleSingUp}>
+            <Form ref={formRef} onSubmit={handleSingnUp}>
               <Input
                 autoCapitalize="words"
                 name="name"
