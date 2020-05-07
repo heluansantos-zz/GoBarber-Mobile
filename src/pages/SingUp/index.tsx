@@ -28,48 +28,51 @@ interface SingUpFormData {
 
 const SigUp: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
-  const navitation = useNavigation();
+  const navigation = useNavigation();
 
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
 
-  const handleSingnUp = useCallback(async (data: SingUpFormData) => {
-    try {
-      formRef.current?.setErrors({});
-      const schema = Yup.object().shape({
-        name: Yup.string().required('Nome obrigatório'),
-        email: Yup.string()
-          .required('E-mail obrigatório')
-          .email('Digite um e-mail válido'),
-        password: Yup.string().min(6, 'No mínimo 6 dígitos'),
-      });
+  const handleSingnUp = useCallback(
+    async (data: SingUpFormData) => {
+      try {
+        formRef.current?.setErrors({});
+        const schema = Yup.object().shape({
+          name: Yup.string().required('Nome obrigatório'),
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido'),
+          password: Yup.string().min(6, 'No mínimo 6 dígitos'),
+        });
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-      await api.post('/users', data);
+        await api.post('/users', data);
 
-      Alert.alert(
-        'Cadastro realizado com sucesso!',
-        'Você ja pode fazer login na aplicação.',
-      );
+        Alert.alert(
+          'Cadastro realizado com sucesso!',
+          'Você ja pode fazer login na aplicação.',
+        );
 
-      navitation.goBack();
-    } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
+        navigation.goBack();
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
 
-        formRef.current?.setErrors(errors);
+          formRef.current?.setErrors(errors);
 
-        return;
+          return;
+        }
+        Alert.alert(
+          'Erro no cadastro',
+          'Ocorreu um erro ao fazer cadastro, tente novamente.',
+        );
       }
-      Alert.alert(
-        'Erro no cadastro',
-        'Ocorreu um erro ao fazer cadastro, tente novamente.',
-      );
-    }
-  }, []);
+    },
+    [navigation],
+  );
   return (
     <>
       <KeyboardAvoidingView
@@ -137,7 +140,7 @@ const SigUp: React.FC = () => {
 
       <BackToSingIn
         onPress={() => {
-          navitation.navigate('SingIn');
+          navigation.navigate('SingIn');
         }}
       >
         <Icon name="arrow-left" size={20} color="#fff" />
